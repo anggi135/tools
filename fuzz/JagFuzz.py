@@ -53,7 +53,7 @@ def fuzz_combined(ssrf_wordlist, traversal_wordlist):
 
 # Argumen CLI
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="BMKG Combined Fuzzer by Anggi")
+    parser = argparse.ArgumentParser(description="Combined Fuzzer by Anggi")
     parser.add_argument("-s", "--ssrf", required=True, help="Wordlist SSRF (e.g. ssrf.txt)")
     parser.add_argument("-t", "--traversal", required=True, help="Wordlist Traversal (e.g. traversal.txt)")
     args = parser.parse_args()
