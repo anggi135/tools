@@ -1,0 +1,24 @@
+:root {
+  --bg: #0f1115;
+  --card: #161a22;
+  --text: #e6e6e6;
+  --muted: #9aa4b2;
+  --primary: #4ea1f3;
+  --success: #8ae234;
+  --border: #232a36;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+h1 { font-size: 20px; margin: 0; }
+.actions button { margin-left: 8px; background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+main { background: var(--card); border: 1px solid var(--border); border-radius: 14px; height: 60vh; padding: 12px; overflow: auto; }
+.messages { display: flex; flex-direction: column; gap: 8px; }
+.msg { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); max-width: 95%; white-space: pre-wrap; }
+.msg.user { align-self: flex-end; background: #142033; border-color: #19314f; }
+.msg.assistant { align-self: flex-start; background: #162118; border-color: #213a25; }
+footer { display: flex; gap: 8px; margin-top: 12px; }
+footer input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+footer button { padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--primary); color: #fff; cursor: pointer; }
+pre { margin: 0; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color: var(--text); }
