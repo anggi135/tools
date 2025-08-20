@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot Pentest (Gemini)</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🤖 Chatbot Pentest — Google Gemini</h1>
+      <div class="actions">
+        <button id="exportBtn">⬇️ Export PDF</button>
+        <button id="resetBtn">♻️ Reset Sesi</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="messages" class="messages"></div>
+    </main>
+
+    <footer>
+      <input id="userInput" type="text" placeholder="Ketik pesan, mis. 'Target: https://example.com'" />
+      <button id="sendBtn">Kirim</button>
+    </footer>
+  </div>
+
+  <script>
+    const messagesDiv = document.getElementById('messages');
+    const input = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Simpel session_id pakai localStorage
+    function uuid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    }
+    let sessionId = localStorage.getItem('pentest_session_id');
+    if (!sessionId) {
+      sessionId = uuid();
+      localStorage.setItem('pentest_session_id', sessionId);
+    }
+
+    function appendMsg(role, text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg ' + role;
+      const pre = document.createElement('pre');
+      pre.textContent = text;
+      wrap.appendChild(pre);
+      messagesDiv.appendChild(wrap);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+      appendMsg('user', message);
+      input.value = '';
+
+      appendMsg('assistant', '⏳ Menyusun respons...');
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId, message })
+        });
+        const data = await res.json();
+        // hapus placeholder terakhir
+        const last = document.querySelector('.msg.assistant:last-child pre');
+        if (last && last.textContent.startsWith('⏳')) {
+          last.textContent = data.response || '(kosong)';
+        } else {
+          appendMsg('assistant', data.response || '(kosong)');
+        }
+      } catch (e) {
+        appendMsg('assistant', 'Terjadi kesalahan: ' + e);
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    exportBtn.addEventListener('click', () => {
+      window.location.href = `/export/pdf?session_id=${encodeURIComponent(sessionId)}`;
+    });
+
+    resetBtn.addEventListener('click', async () => {
+      await fetch('/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+      });
+      localStorage.removeItem('pentest_session_id');
+      sessionId = uuid();
+      localStorage.setItem('pentest_session_id', sessionId);
+      messagesDiv.innerHTML = '';
+      appendMsg('assistant', 'Sesi direset. Silakan sebutkan target & scope yang diizinkan.');
+    });
+
+    // Sambutan awal
+    appendMsg('assistant', 'Halo 👋\nSaya Chatbot Pentest etis berbasis Google Gemini.\nSebutkan target & scope yang sudah Anda miliki izinnya (contoh: domain, subdomain, batasan, larangan DoS).');
+  </script>
+</body>
+</html>
